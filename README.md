@@ -3,7 +3,22 @@
 ![Latest Version](https://img.shields.io/github/v/tag/austincloudguru/terraform-module-template?sort=semver&label=Latest%20Version)
 [![License](https://img.shields.io/github/license/austincloudguru/terraform-module-template)](https://github.com/austincloudguru/terraform-module-template/blob/master/LICENSE)
 
-Terraform module which creates
+Terraform module that creates a S3 bucket on AWS.
+
+## Usage
+```hcl
+module "s3_bucket" {
+  source                  = "AustinCloudGuru/alb/aws/s3"
+  # You should pin the module to a specific version
+  # version                 = "x.x.x"
+  bucket                    = join("-", ["terratest", var.s3_suffix])
+  force_destroy             = true
+  object_lock_enabled       = var.object_lock_enabled
+  object_lock_configuration = var.object_lock_configuration
+  accelerate_configuration  = var.accelerate_configuration
+  tags                      = var.tags
+}
+```
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
