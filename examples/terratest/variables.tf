@@ -4,17 +4,13 @@ variable "region" {
   default     = "us-west-2"
 }
 
-variable "tld" {
-  description = "Top Level Domain"
+variable "s3_suffix" {
+  description = "Suffix for the key to allow for multiple runs"
   type        = string
-  default     = "austincloud.net"
+  default     = "123456"
 }
 
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
-  default = {
-    Environment = "terratest"
-    Terraform   = "true"
-  }
-}
+variable "tags" {}
+variable "object_lock_enabled" {}
+variable "object_lock_configuration" {}
+variable "accelerate_configuration" {}

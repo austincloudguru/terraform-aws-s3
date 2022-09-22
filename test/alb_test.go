@@ -1,36 +1,57 @@
 package test
 
 import (
+	"math/rand"
+	"strconv"
 	"testing"
-	"fmt"
 	"time"
-  http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
-	"github.com/gruntwork-io/terratest/modules/aws"
+
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestExamplesTerraform(t *testing.T) {
-  t.Parallel()
-  terraformOpts := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-    TerraformDir: "../examples/terratest/",
-  })
+	t.Parallel()
 
-  defer terraform.Destroy(t, terraformOpts)
-  terraform.InitAndApply(t, terraformOpts)
+	rand.Seed(time.Now().UnixNano())
 
-  // Verify that the ALB is created
-  albTg := terraform.Output(t, terraformOpts, "target_group_name")
-  assert.Equal(t, albTg, "terratest")
+	randId := strconv.Itoa(rand.Intn(100000))
+	expectedS3Arn := "arn:aws:s3:::terratest-" + randId
 
-  // Verify that the certs 
-  tfCertArn := terraform.Output(t, terraformOpts, "certificate_arn")
-  awsCertArn := aws.GetAcmCertificateArn(t, "us-west-2", "terratest.austincloud.net")
-  assert.Equal(t, awsCertArn, tfCertArn)
+	terraformOpts := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		TerraformDir: "../examples/terratest/",
+		VarFiles: []string{"terratest.tfvars"},
+		Vars: map[string]interface{}{
+			"s3_suffix": randId,
+		},
+	})
 
-   // Verify that the domain returns the default 404
-   fqdn := terraform.Output(t, terraformOpts, "fqdn")
-   url := fmt.Sprintf("http://%s", fqdn)
-   http_helper.HttpGetWithRetry(t, url, nil, 404, "404 Not Found", 10, 10*time.Second)
+	defer terraform.Destroy(t, terraformOpts)
+	terraform.InitAndApply(t, terraformOpts)
+
+	// Set the variables from the tfvars file
+	ObjectLockEnabled := terraform.GetVariableAsStringFromVarFile(t, "../examples/terratest/terratest.tfvars", "object_lock_enabled")
+	
+	// Run `terraform output` to get the value of an output variable
+	s3Arn := terraform.Output(t, terraformOpts, "s3_arn")
+	s3Id := terraform.Output(t, terraformOpts, "s3_id")
+	s3ObjectLockConfigurationId := terraform.Output(t, terraformOpts, "s3_object_lock_configuration_id")
+	s3AccelerateConfigurationId := terraform.Output(t, terraformOpts, "s3_accelerate_configuration_id")
+	s3AclId := terraform.Output(t, terraformOpts, "s3_acl_id")
+	s3VersioningId := terraform.Output(t, terraformOpts, "s3_versioning_id")
+	s3EncryptionId := terraform.Output(t, terraformOpts, "s3_encryption_id")
+
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, expectedS3Arn, s3Arn)
+	if ObjectLockEnabled == "true" {
+		assert.Equal(t, s3ObjectLockConfigurationId, s3Id)
+	}
+	assert.Equal(t, s3AccelerateConfigurationId, s3Id)
+	assert.Equal(t, s3AclId, s3Id + ",private")
+
+	if s3VersioningId != "" {
+		assert.Equal(t, s3VersioningId, s3Id)
+	}
+	assert.Equal(t, s3EncryptionId, s3Id)
 
 }

@@ -1,24 +1,21 @@
-#------------------------------------------------------------------------------
-# Provider
-#------------------------------------------------------------------------------
 provider "aws" {
   region = var.region
 }
 
-data "aws_availability_zones" "available" {}
+terraform {
+  required_version = ">= 1.1, < 1.3"
 
-data "aws_route53_zone" "external" {
-  name = join("", [var.tld, "."])
+  required_providers {
+    aws = ">= 4.0"
+  }
 }
 
-module "vpc" {
-  source             = "terraform-aws-modules/vpc/aws"
-  name               = "terratest-vpc"
-  cidr               = "10.0.0.0/16"
-  azs                = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  private_subnets    = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets     = ["10.0.101.0/24", "10.0.102.0/24"]
-  enable_nat_gateway = true
-  single_nat_gateway = true
-  tags               = var.tags
+module "s3_bucket" {
+  source                    = "../../"
+  bucket                    = join("-", ["terratest", var.s3_suffix])
+  force_destroy             = true
+  object_lock_enabled       = var.object_lock_enabled
+  object_lock_configuration = var.object_lock_configuration
+  accelerate_configuration  = var.accelerate_configuration
+  tags                      = var.tags
 }
