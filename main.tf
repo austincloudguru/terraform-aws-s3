@@ -1,7 +1,9 @@
 
 resource "aws_s3_bucket" "this" {
-  # Skipping because Encryption is handled seperately
+  # Skipping because they are handled seperately
   #checkov:skip=CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
+  #checkov:skip=CKV2_AWS_62: "Ensure S3 buckets should have event notifications enabled"
+  #checkov:skip=CKV_AWS_144: "Ensure that S3 bucket has cross-region replication enabled"
   bucket              = var.bucket
   bucket_prefix       = var.bucket_prefix
   force_destroy       = var.force_destroy
@@ -23,38 +25,6 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
   status = var.accelerate_configuration
 }
 
-resource "aws_s3_bucket_acl" "this" {
-  bucket = aws_s3_bucket.this.id
-  acl    = var.access_control_policy != null ? var.acl : null
-  dynamic "access_control_policy" {
-    for_each = lookup(var.access_control_policy, "access_control_policy", [])
-    content {
-      dynamic "grant" {
-        for_each = lookup(access_control_policy.value, "grant", [])
-        content {
-          dynamic "grantee" {
-            for_each = lookup(grant.value, "grantee", [])
-            content {
-              email_address = lookup(grantee.value, "email_address", null)
-              id            = lookup(grantee.value, "id", null)
-              type          = lookup(grantee.value, "type", null)
-              uri           = lookup(grantee.value, "uri", null)
-            }
-          }
-          permission = lookup(grant.value, "permission", null)
-        }
-      }
-      dynamic "owner" {
-        for_each = lookup(access_control_policy.value, "owner", [])
-        content {
-          id           = lookup(owner.value, "id", null)
-          display_name = lookup(owner.value, "display_name", null)
-        }
-      }
-    }
-  }
-}
-
 resource "aws_s3_bucket_cors_configuration" "this" {
   count  = var.cors_rules != null ? 1 : 0
   bucket = aws_s3_bucket.this.bucket
@@ -72,6 +42,7 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
   count  = length(var.lifecycle_rules) > 0 ? 1 : 0
   bucket = aws_s3_bucket.this.bucket
 

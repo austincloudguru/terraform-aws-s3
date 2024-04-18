@@ -3,10 +3,9 @@ provider "aws" {
 }
 
 terraform {
-  required_version = ">= 1.1, < 1.3"
-
+  required_version = "~> 1.8.0"
   required_providers {
-    aws = ">= 4.0"
+    aws = "~> 5.0"
   }
 }
 

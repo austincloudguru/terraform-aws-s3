@@ -37,7 +37,6 @@ func TestExamplesTerraform(t *testing.T) {
 	s3Id := terraform.Output(t, terraformOpts, "s3_id")
 	s3ObjectLockConfigurationId := terraform.Output(t, terraformOpts, "s3_object_lock_configuration_id")
 	s3AccelerateConfigurationId := terraform.Output(t, terraformOpts, "s3_accelerate_configuration_id")
-	s3AclId := terraform.Output(t, terraformOpts, "s3_acl_id")
 	s3VersioningId := terraform.Output(t, terraformOpts, "s3_versioning_id")
 	s3EncryptionId := terraform.Output(t, terraformOpts, "s3_encryption_id")
 
@@ -47,7 +46,6 @@ func TestExamplesTerraform(t *testing.T) {
 		assert.Equal(t, s3ObjectLockConfigurationId, s3Id)
 	}
 	assert.Equal(t, s3AccelerateConfigurationId, s3Id)
-	assert.Equal(t, s3AclId, s3Id + ",private")
 
 	if s3VersioningId != "" {
 		assert.Equal(t, s3VersioningId, s3Id)
