@@ -18,11 +18,6 @@ output "s3_accelerate_configuration_id" {
   description = "Bucket Id"
 }
 
-output "s3_acl_id" {
-  value       = module.s3_bucket.s3_acl_id
-  description = "Bucket Id"
-}
-
 output "s3_versioning_id" {
   value       = module.s3_bucket.s3_versioning_id
   description = "Bucket Id"

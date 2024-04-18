@@ -54,13 +54,6 @@ output "s3_accelerate_configuration_id" {
   value       = join("", aws_s3_bucket_accelerate_configuration.this.*.id)
 }
 
-output "s3_acl_id" {
-  description = <<-EOF
-  The name of the bucket.
-  EOF
-  value       = join("", aws_s3_bucket_acl.this.*.id)
-}
-
 output "s3_versioning_id" {
   description = <<-EOF
   The name of the bucket.

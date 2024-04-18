@@ -25,47 +25,6 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
   status = var.accelerate_configuration
 }
 
-resource "aws_s3_bucket_ownership_controls" "this" {
-  #checkov:skip=CKV2_AWS_65: "Ensure access control lists for S3 buckets are disabled"
-  bucket = aws_s3_bucket.this.id
-  rule {
-    object_ownership = var.object_ownership
-  }
-}
-
-resource "aws_s3_bucket_acl" "this" {
-  depends_on = [aws_s3_bucket_ownership_controls.this]
-  bucket     = aws_s3_bucket.this.id
-  acl        = var.access_control_policy != null ? var.acl : null
-  dynamic "access_control_policy" {
-    for_each = lookup(var.access_control_policy, "access_control_policy", [])
-    content {
-      dynamic "grant" {
-        for_each = lookup(access_control_policy.value, "grant", [])
-        content {
-          dynamic "grantee" {
-            for_each = lookup(grant.value, "grantee", [])
-            content {
-              email_address = lookup(grantee.value, "email_address", null)
-              id            = lookup(grantee.value, "id", null)
-              type          = lookup(grantee.value, "type", null)
-              uri           = lookup(grantee.value, "uri", null)
-            }
-          }
-          permission = lookup(grant.value, "permission", null)
-        }
-      }
-      dynamic "owner" {
-        for_each = lookup(access_control_policy.value, "owner", [])
-        content {
-          id           = lookup(owner.value, "id", null)
-          display_name = lookup(owner.value, "display_name", null)
-        }
-      }
-    }
-  }
-}
-
 resource "aws_s3_bucket_cors_configuration" "this" {
   count  = var.cors_rules != null ? 1 : 0
   bucket = aws_s3_bucket.this.bucket

@@ -97,15 +97,6 @@ variable "accelerate_configuration" {
   default     = null
 }
 
-variable "acl" {
-  description = <<-EOF
-  The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, 
-  authenticated-read, and log-delivery-write.
-  EOF
-  type        = string
-  default     = "private"
-}
-
 variable "cors_rules" {
   description = <<-EOF
   Specifies the allowed headers, methods, origins and exposed headers when using CORS on this bucket
@@ -119,14 +110,6 @@ variable "cors_rules" {
   }))
   default = null
 
-}
-
-variable "access_control_policy" {
-  description = <<-EOF
-  An ACL policy grant. Conflicts with `acl`
-  EOF
-  type        = map(any)
-  default     = {}
 }
 
 variable "logging" {
