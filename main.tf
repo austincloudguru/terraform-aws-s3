@@ -25,9 +25,18 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
   status = var.accelerate_configuration
 }
 
-resource "aws_s3_bucket_acl" "this" {
+resource "aws_s3_bucket_ownership_controls" "this" {
+  #checkov:skip=CKV2_AWS_65: "Ensure access control lists for S3 buckets are disabled"
   bucket = aws_s3_bucket.this.id
-  acl    = var.access_control_policy != null ? var.acl : null
+  rule {
+    object_ownership = var.object_ownership
+  }
+}
+
+resource "aws_s3_bucket_acl" "this" {
+  depends_on = [aws_s3_bucket_ownership_controls.this]
+  bucket     = aws_s3_bucket.this.id
+  acl        = var.access_control_policy != null ? var.acl : null
   dynamic "access_control_policy" {
     for_each = lookup(var.access_control_policy, "access_control_policy", [])
     content {

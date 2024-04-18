@@ -1,5 +1,5 @@
 # Terraform module
-[![Terratest](https://github.com/austincloudguru/terraform-module-template/workflows/Terratest/badge.svg?event=push)](https://github.com/austincloudguru/terraform-module-template/actions?query=workflow%3ATerratest) 
+[![Terratest](https://github.com/austincloudguru/terraform-module-template/workflows/Terratest/badge.svg)](https://github.com/austincloudguru/terraform-module-template/actions?query=workflow%3ATerratest) 
 ![Latest Version](https://img.shields.io/github/v/tag/austincloudguru/terraform-module-template?sort=semver&label=Latest%20Version)
 [![License](https://img.shields.io/github/license/austincloudguru/terraform-module-template)](https://github.com/austincloudguru/terraform-module-template/blob/master/LICENSE)
 
@@ -51,6 +51,7 @@ No modules.
 | [aws_s3_bucket_lifecycle_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
 | [aws_s3_bucket_logging.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_logging) | resource |
 | [aws_s3_bucket_object_lock_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_object_lock_configuration) | resource |
+| [aws_s3_bucket_ownership_controls.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
 | [aws_s3_bucket_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_public_access_block.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_replication_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_replication_configuration) | resource |
@@ -83,6 +84,7 @@ No modules.
 | <a name="input_logging"></a> [logging](#input\_logging) | Bucket access logging configuration. | <pre>object({<br>    bucket_name = string<br>    prefix      = string<br>  })</pre> | `null` | no |
 | <a name="input_object_lock_configuration"></a> [object\_lock\_configuration](#input\_object\_lock\_configuration) | A configuration for S3 object locking. With S3 Object Lock, you can store objects using a `write once, read many` (WORM) model.<br>Object Lock can help prevent objects from being deleted or overwritten for a fixed amount of time or indefinitely." | <pre>object({<br>    mode  = string # Valid values are GOVERNANCE and COMPLIANCE.<br>    days  = number<br>    years = number<br>  })</pre> | `null` | no |
 | <a name="input_object_lock_enabled"></a> [object\_lock\_enabled](#input\_object\_lock\_enabled) | Indicates whether this bucket has an Object Lock configuration enabled.<br>Valid values are true or false. | `bool` | `false` | no |
+| <a name="input_object_ownership"></a> [object\_ownership](#input\_object\_ownership) | Object ownership. Valid values: BucketOwnerPreferred, ObjectWriter or BucketOwnerEnforced | `string` | `"BucketOwnerPreferred"` | no |
 | <a name="input_replication_configuration"></a> [replication\_configuration](#input\_replication\_configuration) | Map containing cross-region replication configuration. | `any` | `{}` | no |
 | <a name="input_replication_policies"></a> [replication\_policies](#input\_replication\_policies) | Additional IAM policies for the bucket replication | <pre>list(object({<br>    effect    = string<br>    actions   = list(string)<br>    resources = list(string)<br>  }))</pre> | `null` | no |
 | <a name="input_request_payer"></a> [request\_payer](#input\_request\_payer) | Specifies who pays for the download and request fees. Valid values: BucketOwner, Requester. | `string` | `null` | no |

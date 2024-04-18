@@ -42,12 +42,6 @@ variable "tags" {
   EOF
   type        = map(string)
   default     = {}
-  validation {
-    condition = alltrue(
-      [for t in ["fp-component", "fp-owner", "fp-product", "fp-dataclassification"] : contains(keys(var.tags), t)]
-    )
-    error_message = "Please include the following tags: fp-component,  fp-owner, fp-product, fp-dataclassification."
-  }
 }
 
 variable "block_public_acls" {
@@ -128,7 +122,9 @@ variable "cors_rules" {
 }
 
 variable "access_control_policy" {
-  description = "An ACL policy grant. Conflicts with `acl`"
+  description = <<-EOF
+  An ACL policy grant. Conflicts with `acl`
+  EOF
   type        = map(any)
   default     = {}
 }
@@ -153,33 +149,35 @@ variable "request_payer" {
 }
 
 variable "bucket_key_enabled" {
-  description = <<-EOT
+  description = <<-EOF
   Set this to true to use Amazon S3 Bucket Keys for SSE-KMS, which reduce the cost of AWS KMS requests.
-  EOT
+  EOF
   type        = bool
   default     = true
 }
 
 variable "sse_algorithm" {
-  description = <<-EOT
+  description = <<-EOF
   The server-side encryption algorithm to use. Valid values are `AES256` and `aws:kms`
-  EOT
+  EOF
   type        = string
   default     = "aws:kms"
 }
 
 variable "kms_master_key_id" {
-  description = <<-EOT
+  description = <<-EOF
   The AWS KMS master key ARN used for the `SSE-KMS` encryption. This can only be used when you set 
   the value of `sse_algorithm` as `aws:kms`. The default aws/s3 AWS KMS master key is used if this element 
   is absent while the `sse_algorithm` is `aws:kms`
-  EOT
+  EOF
   type        = string
   default     = ""
 }
 
 variable "bucket_policies" {
-  description = "Additional IAM policies for the bucket"
+  description = <<-EOF
+  Additional IAM policies for the bucket
+  EOF
   type = list(object({
     effect    = string
     actions   = list(string)
@@ -189,7 +187,9 @@ variable "bucket_policies" {
 }
 
 variable "replication_policies" {
-  description = "Additional IAM policies for the bucket replication"
+  description = <<-EOF
+  Additional IAM policies for the bucket replication
+  EOF
   type = list(object({
     effect    = string
     actions   = list(string)
@@ -218,13 +218,29 @@ variable "lifecycle_rules" {
 }
 
 variable "website" {
-  description = "Map containing static web-site hosting or redirect configuration."
+  description = <<-EOF
+  Map containing static web-site hosting or redirect configuration.
+  EOF
   type        = any # map(string)
   default     = {}
 }
 
 variable "replication_configuration" {
-  description = "Map containing cross-region replication configuration."
+  description = <<-EOF
+  Map containing cross-region replication configuration.
+  EOF
   type        = any
   default     = {}
+}
+
+variable "object_ownership" {
+  description = <<-EOF
+  Object ownership. Valid values: BucketOwnerPreferred, ObjectWriter or BucketOwnerEnforced
+  EOF
+  type        = string
+  default     = "BucketOwnerPreferred"
+  validation {
+    condition     = contains(["BucketOwnerPreferred", "ObjectWriter", "BucketOwnerEnforced"], var.object_ownership)
+    error_message = "Please set to the proper bucket ownership value: BucketOwnerPreferred, ObjectWriter or BucketOwnerEnforced."
+  }
 }
