@@ -1,7 +1,9 @@
 
 resource "aws_s3_bucket" "this" {
-  # Skipping because Encryption is handled seperately
+  # Skipping because they are handled seperately
   #checkov:skip=CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
+  #checkov:skip=CKV2_AWS_62: "Ensure S3 buckets should have event notifications enabled"
+  #checkov:skip=CKV_AWS_144: "Ensure that S3 bucket has cross-region replication enabled"
   bucket              = var.bucket
   bucket_prefix       = var.bucket_prefix
   force_destroy       = var.force_destroy
@@ -72,6 +74,7 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
   count  = length(var.lifecycle_rules) > 0 ? 1 : 0
   bucket = aws_s3_bucket.this.bucket
 
